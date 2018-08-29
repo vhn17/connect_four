@@ -10,6 +10,7 @@ public class Board {
   private static final char secondP = 'O';
   private final char EMPTY = '.';
   private int[] availableRow;
+  private int[] weights = {1,10,100};
 
   char[][] board1 = {
       {firstP,secondP,secondP,firstP,firstP,secondP,firstP},
@@ -66,7 +67,54 @@ public class Board {
 
   }
 
-  // counts the number of 3 in rows
+  // counts the number of 2 in rows of the given character
+  int count2inRow(char sign) {
+    int counter = 0;
+
+    // 2 in rows, horizontals
+    for(int row = 0; row < ROW; row++) {
+      for(int col = 0; col <= COL - 2; col++) {
+        if(board[row][col] == board[row][col + 1] &&
+           board[row][col + 1] == sign) {
+          counter++;
+        }
+      }
+    }
+
+    // 2 in rows, verticals
+    for(int row = 0; row <= ROW - 2; row++) {
+      for(int col = 0; col < COL; col++) {
+        if(board[row][col] == board[row + 1][col] &&
+           board[row + 1][col] == sign) {
+          counter++;
+        }
+      }
+    }
+
+    // 2 in rows, ascending diagonals
+    for(int row = 0; row <= ROW - 2; row++) {
+      for(int col = 0; col <= COL - 2; col++) {
+        if(board[row][col] == board[row + 1][col + 1] &&
+           board[row + 1][col + 1] == sign) {
+          counter++;
+        }
+      }
+    }
+
+    // 2 in rows, descending diagonals
+    for(int row = 0; row <= ROW - 2; row++) {
+      for(int col = 1; col < COL; col++) {
+        if(board[row][col] == board[row + 1][col - 1] &&
+           board[row + 1][col - 1] == sign ) {
+          counter++;
+        }
+      }
+    }
+    System.out.println(sign + " 2s " + counter);
+    return counter;
+  }
+
+  // counts the number of 3 in rows of the given character
   int count3inRow(char sign) {
     int counter = 0;
     // count 3 in rows horizontally
@@ -112,6 +160,7 @@ public class Board {
         }
       }
     }
+    System.out.println(sign + " 3s " + counter);
     return counter;
   }
 
@@ -164,6 +213,22 @@ public class Board {
     }
 
     return false;
+  }
+
+  int evaluate() {
+    int firstScore = 0;
+    int secondScore = 0;
+    if(hasWinner()) {
+      if(getLastMark() == firstP) {
+        firstScore += weights[2];
+      } else {
+        secondScore += weights[2];
+      }
+    }
+
+    firstScore += (weights[1] * count3inRow(firstP) + count2inRow(firstP));
+    secondScore += (weights[1] * count3inRow(secondP) + count2inRow(secondP));
+    return firstScore - secondScore;
   }
 
   boolean isFinished() {
