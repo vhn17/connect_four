@@ -62,7 +62,8 @@ public class Board {
   public void undoMove() {
     Move lastMove = moves.pollLast();
     int col = lastMove.getCol();
-    board[--availableRow[col]][col] = EMPTY;
+    availableRow[col]--;
+    board[availableRow[col]][col] = EMPTY;
 
   }
 

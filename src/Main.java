@@ -6,7 +6,7 @@ public class Main {
     boolean compFirst;
     char pSign;
     MiniMax miniMax = new MiniMax();
-    int depth = 5;
+    int depth = 6;
 
     Board board = new Board();
     board.printBoard();
@@ -35,7 +35,7 @@ public class Main {
         board.makeMove(move);
         board.printBoard();
 
-        if(compFirst) {
+        if(compFirst && !board.isFinished()) {
           move = miniMax.getMaxMove(board, depth);
         } else {
           move = miniMax.getMinMove(board, depth);
@@ -46,6 +46,16 @@ public class Main {
       } else {
         System.out.println("Invalid move, try again please");
       }
+    }
+    if(board.hasWinner()) {
+      char winnerMark = board.getLastMark();
+      if(winnerMark == pSign) {
+        System.out.println("You won");
+      } else {
+        System.out.println("You lost");
+      }
+    } else {
+      System.out.println("It's a draw");
     }
   }
 }
