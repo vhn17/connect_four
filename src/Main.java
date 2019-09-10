@@ -16,11 +16,12 @@ public class Main {
     String answer = scanner.next();
     if (answer.equalsIgnoreCase("yes")) {
       compFirst = false;
-      pSign = board.firstP;
+      pSign = Board.firstP;
     } else {
       compFirst = true;
-      pSign = board.secondP;
+      pSign = Board.secondP;
       Move move = miniMax.getMaxMove(board, depth);
+      System.out.println("The computer chose column " + (move.getCol() + 1));
       board.makeMove(move);
       board.printBoard();
     }
@@ -34,19 +35,27 @@ public class Main {
 
         board.makeMove(move);
         board.printBoard();
+        System.out.println();
 
-        if(compFirst && !board.isFinished()) {
+        if (board.isFinished()) {
+          break;
+        }
+
+        if(compFirst) {
           move = miniMax.getMaxMove(board, depth);
         } else {
           move = miniMax.getMinMove(board, depth);
         }
 
         board.makeMove(move);
+        System.out.println("The computer chose column " + (move.getCol() + 1));
         board.printBoard();
+        System.out.println();
       } else {
         System.out.println("Invalid move, try again please");
       }
     }
+
     if(board.hasWinner()) {
       char winnerMark = board.getLastMark();
       if(winnerMark == pSign) {

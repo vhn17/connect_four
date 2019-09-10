@@ -12,31 +12,6 @@ public class Board {
   private int[] availableRow;
   private int[] weights = {1, 10, 100};
 
-  char[][] board1 = {
-      {firstP, secondP, secondP, firstP, firstP, secondP, firstP},
-      {EMPTY, firstP, firstP, EMPTY, EMPTY, firstP, EMPTY},
-      {EMPTY, firstP, EMPTY, EMPTY, firstP, EMPTY, EMPTY},
-      {EMPTY, EMPTY, firstP, EMPTY, EMPTY, EMPTY, EMPTY},
-      {EMPTY, firstP, EMPTY, EMPTY, EMPTY, firstP, firstP},
-      {firstP, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, firstP},
-  };
-  char[][] board2 = {
-      {firstP, firstP, firstP, firstP, firstP, firstP, EMPTY},
-      {firstP, firstP, firstP, firstP, firstP, firstP, firstP},
-      {firstP, firstP, firstP, firstP, firstP, firstP, firstP},
-      {firstP, firstP, firstP, firstP, firstP, firstP, firstP},
-      {firstP, firstP, firstP, firstP, firstP, firstP, firstP},
-      {firstP, firstP, firstP, firstP, firstP, firstP, firstP}
-  };
-  char[][] board3 = {
-      {firstP, secondP, firstP, secondP, firstP, secondP, firstP},
-      {secondP, firstP, secondP, firstP, secondP, firstP, secondP},
-      {firstP, secondP, firstP, secondP, firstP, secondP, firstP},
-      {secondP, firstP, secondP, firstP, secondP, firstP, secondP},
-      {firstP, secondP, firstP, secondP, firstP, secondP, firstP},
-      {secondP, firstP, secondP, firstP, secondP, firstP, EMPTY}
-  };
-
   Board() {
     board = new char[ROW][COL];
     for (int row = 0; row < ROW; row++) {
@@ -48,171 +23,93 @@ public class Board {
     moves = new LinkedList<>();
   }
 
-  public boolean isValid(Move move) {
+  boolean isValid(Move move) {
     int col = move.getCol();
     return (col >= 0 && col < COL && availableRow[col] <= ROW - 1);
   }
 
-  public void makeMove(Move move) {
+  void makeMove(Move move) {
     moves.add(move);
     int col = move.getCol();
     board[availableRow[col]++][col] = move.getSign();
   }
 
-  public void undoMove() {
+  void undoMove() {
     Move lastMove = moves.pollLast();
+    assert lastMove != null;
     int col = lastMove.getCol();
     availableRow[col]--;
     board[availableRow[col]][col] = EMPTY;
 
   }
 
-  // counts the number of 2 in rows of the given character
-  int count2inRow(char sign) {
+  private int countNInRow(char sign, int n) {
     int counter = 0;
 
-    // 2 in rows, horizontals
+    // n in rows, horizontals
     for (int row = 0; row < ROW; row++) {
-      for (int col = 0; col <= COL - 2; col++) {
-        if (board[row][col] == board[row][col + 1] &&
-            board[row][col + 1] == sign) {
-          counter++;
+      for (int col = 0; col <= COL - n; col++) {
+        boolean flag = true;
+
+        for (int i = 1; i < n; i++) {
+          flag &= (board[row][col + i - 1] == board[row][col + i]);
         }
+
+        flag &= (board[row][col + n - 1] == sign);
+
+        if (flag) counter++;
       }
     }
 
-    // 2 in rows, verticals
-    for (int row = 0; row <= ROW - 2; row++) {
+    // n in rows, verticals
+    for (int row = 0; row <= ROW - n; row++) {
       for (int col = 0; col < COL; col++) {
-        if (board[row][col] == board[row + 1][col] &&
-            board[row + 1][col] == sign) {
-          counter++;
+        boolean flag = true;
+
+        for (int i = 1; i < n; i++) {
+          flag &= (board[row + i - 1][col] == board[row + i][col]);
         }
+
+        flag &= (board[row + n - 1][col] == sign);
+
+        if (flag) counter++;
       }
     }
 
-    // 2 in rows, ascending diagonals
-    for (int row = 0; row <= ROW - 2; row++) {
-      for (int col = 0; col <= COL - 2; col++) {
-        if (board[row][col] == board[row + 1][col + 1] &&
-            board[row + 1][col + 1] == sign) {
-          counter++;
+    // n in rows, ascending diagonals
+    for (int row = 0; row <= ROW - n; row++) {
+      for (int col = 0; col <= COL - n; col++) {
+        boolean flag = true;
+
+        for (int i = 1; i < n; i++) {
+          flag &= (board[row + i - 1][col + i - 1] == board[row + i][col + i]);
         }
+
+        flag &= (board[row + n - 1][col + n - 1] == sign);
+        if (flag) counter++;
       }
     }
 
-    // 2 in rows, descending diagonals
-    for (int row = 0; row <= ROW - 2; row++) {
-      for (int col = 1; col < COL; col++) {
-        if (board[row][col] == board[row + 1][col - 1] &&
-            board[row + 1][col - 1] == sign) {
-          counter++;
+    // n in rows, descending diagonals
+    for (int row = 0; row <= ROW - n; row++) {
+      for (int col = n - 1; col < COL; col++ ) {
+        boolean flag = true;
+
+        for (int i = 1; i < n; i++) {
+          flag &= (board[row + i - 1][col - (i - 1)] == board[row + i][col - i]);
         }
+
+        flag &= (board[row + n - 1][col - (n - 1)] == sign);
+
+        if (flag) counter++;
       }
     }
+
     return counter;
   }
 
-  // counts the number of 3 in rows of the given character
-  int count3inRow(char sign) {
-    int counter = 0;
-    // count 3 in rows horizontally
-    for (int row = 0; row < ROW; row++) {
-      for (int col = 0; col <= COL - 3; col++) {
-        if (board[row][col] == board[row][col + 1] &&
-            board[row][col + 1] == board[row][col + 2] &&
-            board[row][col + 2] == sign) {
-          counter++;
-        }
-      }
-    }
-
-    // count 3 in rows vertically
-    for (int row = 0; row <= ROW - 3; row++) {
-      for (int col = 0; col < COL; col++) {
-        if (board[row][col] == board[row + 1][col] &&
-            board[row + 1][col] == board[row + 2][col] &&
-            board[row + 2][col] == sign) {
-          counter++;
-        }
-      }
-    }
-
-    // 3 in rows, ascending diagonals
-    for (int row = 0; row <= ROW - 3; row++) {
-      for (int col = 0; col <= COL - 3; col++) {
-        if (board[row][col] == board[row + 1][col + 1] &&
-            board[row + 1][col + 1] == board[row + 2][col + 2] &&
-            board[row + 2][col + 2] == sign) {
-          counter++;
-        }
-      }
-    }
-
-    // 3 in rows, descending diagonals
-    for (int row = 0; row <= ROW - 3; row++) {
-      for (int col = 2; col < COL; col++) {
-        if (board[row][col] == board[row + 1][col - 1] &&
-            board[row + 1][col - 1] == board[row + 2][col - 2] &&
-            board[row + 2][col - 2] == sign) {
-          counter++;
-        }
-      }
-    }
-    return counter;
-  }
-
-  // checks, if we have 4 in a row of one kind
   boolean hasWinner() {
-    // 4 in a row vertically
-    for (int row = 0; row < ROW; row++) {
-      for (int col = 0; col <= COL - 4; col++) {
-        if (board[row][col] == board[row][col + 1] &&
-            board[row][col + 1] == board[row][col + 2] &&
-            board[row][col + 2] == board[row][col + 3] &&
-            board[row][col + 3] != EMPTY) {
-          return true;
-        }
-      }
-    }
-
-    // 4 in a row horizontally
-    for (int row = 0; row <= ROW - 4; row++) {
-      for (int col = 0; col < COL; col++) {
-        if (board[row][col] == board[row + 1][col] &&
-            board[row + 1][col] == board[row + 2][col] &&
-            board[row + 2][col] == board[row + 3][col] &&
-            board[row + 3][col] != EMPTY) {
-          return true;
-        }
-      }
-    }
-
-    // 4 in a row, ascending diagonal
-    for (int row = 0; row <= ROW - 4; row++) {
-      for (int col = 0; col <= COL - 4; col++) {
-        if (board[row][col] == board[row + 1][col + 1] &&
-            board[row + 1][col + 1] == board[row + 2][col + 2] &&
-            board[row + 2][col + 2] == board[row + 3][col + 3] &&
-            board[row + 3][col + 3] != EMPTY) {
-          return true;
-        }
-      }
-    }
-
-    // 4 in a row, descending diagonal
-    for (int row = 0; row <= ROW - 4; row++) {
-      for (int col = 3; col < COL; col++) {
-        if (board[row][col] == board[row + 1][col - 1] &&
-            board[row + 1][col - 1] == board[row + 2][col - 2] &&
-            board[row + 2][col - 2] == board[row + 3][col - 3] &&
-            board[row + 3][col - 3] != EMPTY) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    return countNInRow(firstP, 4) > 0 || countNInRow(secondP, 4) > 0;
   }
 
   int evaluate() {
@@ -225,9 +122,8 @@ public class Board {
         secondScore += weights[2];
       }
     }
-
-    firstScore += (weights[1] * count3inRow(firstP) + count2inRow(firstP));
-    secondScore += (weights[1] * count3inRow(secondP) + count2inRow(secondP));
+    firstScore += (weights[1] * countNInRow(firstP, 3) + countNInRow(firstP, 2));
+    secondScore += (weights[1] * countNInRow(secondP, 3) + countNInRow(secondP, 2));
     return firstScore - secondScore;
   }
 
@@ -254,7 +150,7 @@ public class Board {
     return moves.peekLast().getSign();
   }
 
-  public void printBoard() {
+  void printBoard() {
     for (int row = ROW - 1; row >= 0; row--) {
       for (int i = 0; i < COL; i++) {
         System.out.print(" -");

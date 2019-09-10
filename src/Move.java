@@ -9,15 +9,15 @@ public class Move {
     this.val = 0;
   }
 
-  public char getSign() {
+  char getSign() {
     return sign;
   }
 
-  public int getCol() {
+  int getCol() {
     return col;
   }
 
-  public int getVal() {
+  int getVal() {
     return val;
   }
 
@@ -25,11 +25,11 @@ public class Move {
     this.sign = sign;
   }
 
-  public void setCol(int col) {
+  void setCol(int col) {
     this.col = col;
   }
 
-  public void setVal(int val) {
+  void setVal(int val) {
     this.val = val;
   }
 }

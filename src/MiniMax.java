@@ -4,7 +4,7 @@ import java.util.Random;
 public class MiniMax {
 
   Move getMaxMove(Board board, int depth) {
-    Move move = new Move(board.firstP);
+    Move move = new Move(Board.firstP);
     if(board.isFinished() || depth == 0) {
       move.setVal(board.evaluate() - 1000 * depth);
       return move;
@@ -34,7 +34,7 @@ public class MiniMax {
   }
 
   Move getMinMove(Board board, int depth) {
-    Move move = new Move(board.secondP);
+    Move move = new Move(Board.secondP);
     if(board.isFinished() || depth == 0) {
       move.setVal(board.evaluate() + 1000 * depth);
       return move;
